@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adobe Podcast Guide (UIUC)</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
+
+  <!-- UIUC brand typefaces -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root{
+      /* UIUC brand colors (primary) */
+      --il-orange:#FF5F05;
+      --il-blue:#13294B;
+
+      /* Neutral “Storm” family from UIUC palette (use sparingly) */
+      --storm-700:#707372;
+      --storm-500:#9C9A9D;
+      --storm-300:#C8C6C7;
+
+      /* Helpful derived tokens */
+      --il-blue-ink:#0f2240;
+      --surface:#ffffff;
+      --surface-2:#f8f9fa; /* close to Bootstrap light */
+      --border: rgba(19, 41, 75, .15);
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+
+      --font-display: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --font-body: "Source Sans 3", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --font-serif: Georgia, "Times New Roman", Times, serif;
+    }
+
+    body{
+        font-family: var(--font-body);
+        color: var(--il-blue);
+        background-color: white;
+    }
+
+    h1, h2, h3, .display-font{
+      font-family: var(--font-display);
+      letter-spacing: -0.02em;
+    }
+
+    .badge-uiuc{
+      background: rgba(255,95,5,.12);
+      color: var(--il-blue);
+      border: 1px solid rgba(255,95,5,.25);
+      font-weight: 600;
+    }
+
+    .card{
+      border: 1px solid var(--border);
+      box-shadow: none;
+      border-radius: 1rem;
+    }
+
+    .card-soft{
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-uiuc{
+      background: var(--il-orange);
+      border-color: var(--il-orange);
+      color: #111;
+      font-weight: 700;
+    }
+    .btn-uiuc:hover, .btn-uiuc:focus{
+      background: #ff7a2e;
+      border-color: #ff7a2e;
+      color: #111;
+    }
+
+    .link-uiuc{
+      color: var(--il-blue);
+      text-decoration-color: rgba(255,95,5,.55);
+      text-underline-offset: 3px;
+    }
+    .link-uiuc:hover{
+      color: var(--il-blue-ink);
+      text-decoration-color: var(--il-orange);
+    }
+
+    .callout{
+      background: rgba(255,95,5,.06);
+      border-radius: 1rem;
+      border: 1px solid rgba(255,95,5,.18);
+    }
+
+    .kicker{
+      color: var(--storm-700);
+      font-weight: 600;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      font-size: .85rem;
+    }
+
+    .small-muted{
+      color: var(--storm-700);
+    }
+
+    .figure-placeholder{
+      border: 1px dashed rgba(19,41,75,.25);
+      border-radius: .75rem;
+      background: rgba(19,41,75,.03);
+      min-height: 180px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 1rem;
+      color: var(--storm-700);
+    }
+
+    .list-check li{
+      margin-bottom: .35rem;
+      padding-left: .15rem;
+    }
+    .list-check li::marker{
+      content: "✓  ";
+      color: var(--il-orange);
+      font-weight: 800;
+    }
+
+    /* Improve focus visibility (keyboard users) */
+    :focus-visible{
+      outline: 3px solid rgba(255,95,5,.65);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="container py-5">
+    <!-- Introduction -->
+    <section id="introduction" class="mb-5">
+      <div class="row g-4">
+        <div class="col-lg-8">
+        <p class="kicker mb-2">Tool Guide</p>
+          <h1 class="mb-2">Adobe Podcast</h1>
+          <h2 class="mb-3">Introduction</h2>
+          <p style="max-width: 75ch;">
+            Adobe Podcast is a web-based tool that allows users to record and edit podcast-style content, including exporting audio files, video files, and more. It also has user-friendly tools that allow for processing audio.
+          </p>
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="badge rounded-pill badge-uiuc px-3 py-2">
+              <i class="bi bi-clock-history me-1"></i>
+              Last Updated: March 4, 2026
+            </span>
+
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="h6 mb-2">Good fit for</h3>
+              <ul class="mb-0 list-check">
+                <li>Course narration &amp; mini-lectures</li>
+                <li>Project-Based Learning</li>
+                <li>Interviews (including remote guests)</li>
+                <li>Clubs &amp; student organization media</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="mb-5">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <h2 class="mb-0">Pricing</h2>
+      </div>
+
+      <p style="max-width: 85ch;">
+        Adobe Podcast Studio is available at the premium level to all Adobe Creative Cloud subscribers
+        (free for UIUC faculty and staff). For users without a Creative Cloud plan, there is a free tier.
+      </p>
+
+      <div class="row g-4">
+        <!-- Free -->
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between gap-3">
+                <div>
+                  <h3 class="h5 mb-1">Free tier</h3>
+                  <p class="small-muted mb-3">Helpful for quick cleanup and short projects.</p>
+                </div>
+                <span class="badge rounded-pill text-bg-light border" style="border-color: var(--border)!important;">
+                  <i class="bi bi-unlock me-1"></i>Free
+                </span>
+              </div>
+
+              <div class="mb-3">
+                <h4 class="h6 mb-2"><i class="bi bi-soundwave me-2"></i>Enhance Speech</h4>
+                <ul class="mb-0">
+                  <li>Enhance audio only, no video support</li>
+                  <li>No bulk processing, upload one at a time</li>
+                  <li>No strength adjustment</li>
+                  <li>30 minutes max duration (up to 500MB), 1 hour max per day</li>
+                </ul>
+              </div>
+
+              <div class="mb-3">
+                <h4 class="h6 mb-2"><i class="bi bi-sliders me-2"></i>Studio</h4>
+                <ul class="mb-0">
+                  <li>Download projects up to 30 minutes, 2 projects per day</li>
+                  <li>No download of original recordings</li>
+                  <li>Podcast branded audiograms</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="h6 mb-2"><i class="bi bi-mic me-2"></i>Mic Check</h4>
+                <ul class="mb-0">
+                  <li>AI analysis of your microphone setup</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium -->
+        <div class="col-lg-6">
+          <div class="card h-100 card-soft">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between gap-3">
+                <div>
+                  <h3 class="h5 mb-1">Premium (Creative Cloud)</h3>
+                  <p class="small-muted mb-3">Best for sustained teaching workflows and longer projects.</p>
+                </div>
+                <span class="badge rounded-pill px-3 py-2" style="background: rgba(19,41,75,.10); color: var(--il-blue); border: 1px solid var(--border);">
+                  <i class="bi bi-stars me-1"></i>Premium Tier
+                </span>
+              </div>
+              <div class="mb-3">
+                <h4 class="h6 mb-2"><i class="bi bi-soundwave me-2"></i>Enhance Speech</h4>
+                <ul class="mb-0">
+                  <li>Support for video audio, including MP4 and MOV</li>
+                  <li>Bulk processing supported</li>
+                  <li>Fine tune level of processing</li>
+                  <li>Process 4 Hours daily, files up to 1 GB</li>
+                </ul>
+              </div>
+            <div class="mb-3">
+                <h4 class="h6 mb-2"><i class="bi bi-sliders me-2"></i>Studio</h4>
+                <ul class="mb-0">
+                    <li>No download limits on Studio projects</li>
+                    <li>Download original recordings, speaker-seperated</li>
+                    <li>Customize audiograms and captions with themes</li>
+                    <li>Upload custom backgrounds for audiograms</li>
+                </ul>
+            </div>
+              <!-- <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-uiuc" href="#studio">
+                  <i class="bi bi-play-circle me-2"></i>Jump to Studio workflow
+                </a>
+                <a class="btn btn-outline-secondary" href="#resources">
+                  <i class="bi bi-box-arrow-up-right me-2"></i>Plan comparison links
+                </a>
+              </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pt-4">
+        <span class="small-muted">
+          <i class="bi bi-info-circle me-1"></i>
+          Source: <a class="link-uiuc" href="https://podcast.adobe.com/en/plans" target="_blank" rel="noopener">
+                "Adobe Podcast Plans" <i class="bi bi-box-arrow-up-right ms-1"></i>
+              </a>
+        </span>
+      </div>  
+    </section>
+
+    <!-- Overview -->
+    <section id="overview" class="mb-5">
+      <h2 class="mb-3">Overview</h2>
+      <p style="max-width: 90ch;">
+        This lightweight web-browser tool provides a surprising depth of quality and power with a user-friendly interface.
+        Highlights include <strong>Record a Podcast</strong>, <strong>Enhance Speech</strong>, <strong>Caption Video</strong>,
+        <strong>Convert Audio to Video</strong>, <strong>Transcribe Audio &amp; Video</strong>, and <strong>Edit Audio &amp; Video</strong>.
+        All of these tools are accessible from within your browser without requiring specialized audio equipment or software.
+      </p>
+
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 mb-2"><i class="bi bi-mortarboard me-2"></i>Instructional uses</h3>
+              <ul class="mb-0">
+                <li>Collaborative podcast projects</li>
+                <li>Personalized audio feedback</li>
+                <li>Microlectures</li>
+                <li>Student interviews, audio journals, &amp; reflections</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 mb-2"><i class="bi bi-people me-2"></i>Student org / club uses</h3>
+              <ul class="mb-0">
+                <li>Recruitment stories</li>
+                <li>Event recaps</li>
+                <li>Member spotlights</li>
+                <li>Podcast-style series</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 mb-2"><i class="bi bi-building me-2"></i>Organizational uses</h3>
+              <ul class="mb-0">
+                <li>Internal comms updates</li>
+                <li>Training narration</li>
+                <li>Quick announcements</li>
+                <li>Reusable templates</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Enhance Audio & Mic Check -->
+    <section id="enhance" class="mb-5">
+      <h2 class="mb-3">Enhance Audio &amp; Mic Check</h2>
+
+      <p style="max-width: 90ch;">
+        One common pain point in course media production (for students and instructors) is limited access to specialized recording equipment. While good microphones help, Adobe Podcast’s <strong>Enhance Audio</strong> can make a meaningful improvement with minimal setup.
+      </p>
+
+      <div class="callout p-4 mb-4">
+        <div class="d-flex align-items-start gap-3">
+          <div class="fs-3" aria-hidden="true"><i class="bi bi-quote"></i></div>
+          <div>
+            <h3 class="h6 mb-2">Example (CITL Instructional Media Producer, Jacob)</h3>
+<!-- !!!!! INSERT VIDEO HERE !!!!!!             -->
+            <p class="mb-3">[COMPARISON VIDEO EXAMPLE]</p>
+            <p class="mb-0 small-muted">
+              *** NOTE TO SELF PUT VIDEO DESCRIPTION HERE ***
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 mb-2">Why it matters</h3>
+              <p class="mb-3" style="max-width: 85ch;">
+                These tools allow you to record in noisy situations and process audio to improve speech clarity while reducing external noise, all while using non-specialzied equipment like your phone or webcam microphone.
+              </p>
+
+                <h3 class="h6 mb-2">Supported file types</h3>
+                <ul class="list-unstyled mb-0">
+                <li class="mb-2">
+                    <i class="bi bi-file-earmark-music me-2" style="color: var(--il-orange);"></i>
+                    <strong>Audio:</strong> .wav, .mp3, .m4a, .aac, .flac
+                </li>
+                <li>
+                    <i class="bi bi-file-earmark-play me-2" style="color: var(--il-orange);"></i>
+                    <strong>Video:</strong> .mp4, .mov, .m4v
+                </li>
+                </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 mb-2">Mic Check (pre-recording)</h3>
+              <p class="mb-3">
+                Record a short test sample and receive feedback on:
+              </p>
+              <ul class="mb-0">
+                <li>Microphone distance</li>
+                <li>Gain</li>
+                <li>Background noise</li>
+                <li>Echo</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Studio -->
+    <section id="studio" class="mb-5">
+      <h2 class="mb-3">Studio</h2>
+        <p style="max-width: 90ch;">
+        As much as can be accomplished just with Enhance Audio and Mic Check, Adobe Podcast Studio packs in even more—enough to warrant its own section. Let’s dig in together.
+        </p>
+        <a href="https://podcast.adobe.com/" target="_blank" rel="noopener noreferrer" class="btn btn-uiuc mb-4"> Open Adobe Podcast <i class="bi bi-box-arrow-up-right ms-1"></i>
+        </a>
+      <div class="accordion" id="studioAccordion">
+        <div class="accordion-item">
+          <h3 class="accordion-header" id="step1">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+              <i class="bi bi-1-circle me-2"></i> Start a new project
+            </button>
+          </h3>
+          <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="step1" data-bs-parent="#studioAccordion">
+            <div class="accordion-body">
+                <p class="mb-3">First, click the <strong>New Project</strong> button to get started.</p>
+              <figure class="mb-3">
+                <img 
+                    src="assets/podcastscreen1.png" 
+                    class="img-fluid" 
+                    style="border-radius: .75rem; border: 1px solid var(--border);" 
+                    alt="Adobe Podcast Studio start screen with a 'New Project' button."
+                />
+                </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header" id="step2">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+              <i class="bi bi-2-circle me-2"></i> Add music (optional) and plan your structure
+            </button>
+          </h3>
+          <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="step2" data-bs-parent="#studioAccordion">
+            <div class="accordion-body">
+              <p style="max-width: 95ch;">
+                Options unfold quickly. In this example workflow, you can click <strong>Music</strong>, explore a pack
+                (e.g., “Fuzz”), and select a short intro for your project. You might use a different set, your own music
+                files, or no music at all.
+              </p>
+              <ul>
+                <li>
+                  Adobe music sets can provide a cohesive theme (intros, outros, bumpers, background beds).
+                </li>
+                <li>
+                  Using your own files can bring a unique musical identity—be mindful of copyright permissions.
+                </li>
+              </ul>
+              <figure class="mb-3">
+                <img 
+                    src="assets/podcastscreen2.png" 
+                    class="img-fluid" 
+                    style="border-radius: .75rem; border: 1px solid var(--border);" 
+                    alt="Adobe Podcast Studio start screen with a 'New Project' button."
+                />
+                </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header" id="step3">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+              <i class="bi bi-3-circle me-2"></i> Build with placeholders (a planning-first workflow)
+            </button>
+          </h3>
+          <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="step3" data-bs-parent="#studioAccordion">
+            <div class="accordion-body">
+              <p style="max-width: 95ch;">
+                With an intro added, you can create your first “event” in the timeline (often organized vertically).
+                To plan the recording, add placeholders from the left interface (e.g., “Jacob: Introduction to Adobe Podcast”)
+                and add background audio as needed.
+              </p>
+              <figure class="mb-3">
+                <img 
+                    src="assets/podcastscreen3.png" 
+                    class="img-fluid" 
+                    style="border-radius: .75rem; border: 1px solid var(--border);" 
+                    alt="Adobe Podcast Studio start screen with a 'New Project' button."
+                />
+                </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header" id="step4">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+              <i class="bi bi-4-circle me-2"></i> Record into placeholders
+            </button>
+          </h3>
+          <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="step4" data-bs-parent="#studioAccordion">
+            <div class="accordion-body">
+              <p style="max-width: 95ch;">
+                When it’s time to record, select a placeholder by clicking it, then record. The placeholder becomes the
+                target for your recording, keeping long projects organized and easier to revise later.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header" id="step5">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+              <i class="bi bi-5-circle me-2"></i> Export your project
+            </button>
+          </h3>
+          <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="step5" data-bs-parent="#studioAccordion">
+            <div class="accordion-body">
+              <p class="mb-2" style="max-width: 95ch;">
+                Select <strong>Export</strong> from the top of the window to access export options such as:
+              </p>
+              <ul>
+                <li><strong>Audio</strong> (e.g., mp3)</li>
+                <li><strong>Audiogram</strong> (animated transcript elements with video output)</li>
+                <li><strong>Transcript</strong> (text)</li>
+                <li>
+                  <strong>Original recordings</strong> as separate participant files (Premium tier only)
+                </li>
+              </ul>
+              <figure class="mb-3">
+                <img 
+                    src="assets/podcastscreen4.png" 
+                    class="img-fluid" 
+                    style="border-radius: .75rem; border: 1px solid var(--border);" 
+                    alt="Adobe Podcast Studio start screen with a 'New Project' button."
+                />
+                </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Invite Guests / Share -->
+    <section id="collaboration" class="mb-5">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h2 class="h5 mb-3"><i class="bi bi-person-plus me-2"></i>Invite Guests</h2>
+              <p style="max-width: 85ch;">
+                You might have noticed there was a placeholder in the project for Bob. Use <strong>Invite Guests</strong> (upper-right) to collaborate without requiring guests to sign in to Adobe Podcast. After recording, you can apply the same audio enhancement described earlier to your guests' recordings.
+              </p>
+              <h3 class="h6 mb-2">Why this is powerful</h3>
+              <ul class="mb-0">
+                <li>Works asynchronously (guests can record at a convenient time)</li>
+                <li>Supports interviews, panels, and student contributions</li>
+                <li>Centralizes files in one project timeline</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h2 class="h5 mb-3"><i class="bi bi-share me-2"></i>Share (templates for classes)</h2>
+              <p style="max-width: 90ch;">
+                A useful feature for assignments is the ability to use <strong>Share</strong> to share your project as a <strong>template</strong>. Students can edit their own version, but not your original.
+              </p>
+
+              <div class="callout p-3">
+                <h3 class="h6 mb-2">Assignment idea</h3>
+                <p class="mb-0" style="max-width: 90ch;">
+                  Create a “fictional show” with your source audio, host narration, and placeholders for student segments. Students add commentary into the placeholders, export, and submit to Canvas.
+                </p>
+                <hr class="my-3" style="border-color: rgba(255,95,5,.25);">
+
+                <p class="mb-2" style="max-width: 90ch;"><strong>Example template setup:</strong></p>
+
+                <p class="mb-2" style="max-width: 90ch;">
+                <strong>Instructor:</strong> "Next we will hear an excerpt from a 1965 interview with artist Robert Rauschenberg."
+                </p>
+
+                <p class="mb-2 small-muted" style="max-width: 90ch;">
+                <em>[Audio clip from interview plays]</em>
+                </p>
+
+                <p class="mb-2" style="max-width: 90ch;">
+                <strong>Instructor:</strong> "Based on Rauschenberg's statement that he wanted to work in the 'gap between art and life,' how does that change your reaction to his use of everyday street trash in his Combines?"
+                </p>
+
+                <p class="mb-0 small-muted" style="max-width: 90ch;">
+                <em>[Placeholder for student to record response]</em>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Audiogram -->
+    <section id="audiogram" class="mb-4">
+      <h2 class="mb-3">Audiograms</h2>
+        <p style="max-width: 95ch;">
+        One project export format is the Audiogram. The Audiogram converts the audio-driven format of a podcast into an engaging video including visual theme elements. These can be handy for posting and sharing your projects on social media.
+        </p>
+
+        <p style="max-width: 95ch;">
+        <strong>Make it your own!</strong> Choose from provided themes and visual styles. The premium tier also allows for the ability to upload your own custom images, including brand assets.
+        </p>
+
+      <div class="card">
+        <div class="card-body">
+          <h3 class="h6 mb-2">Audiogram Example</h3>
+          <p class="mb-3">
+            View our demo project from this guide as an Audiogram:
+          </p>
+        </div>
+      </div>
+    </section>
+    <!-- Additional Features to explore -->
+    <section id="summary" class="mb-4">
+      <h2 class="mb-3">Additional Features to Explore</h2>
+      <p style="max-width: 95ch;">
+        Adobe Podcast continues to add additional features and refinements regularly. Some additional features to explore in your projects:
+      </p>
+
+      <div class="card">
+        <div class="card-body">
+            <p class="mb-2" style="max-width: 90ch;"><strong>Quick Tips</strong></p>
+            <p class="mb-2" style="max-width: 90ch;">
+            <strong>Text Based Edits: </strong>When you delete strings of words from the transcript, the video cuts those same segments out too.
+            </p>
+            <p class="mb-2" style="max-width: 90ch;">
+            <strong>Multitrack Importing: </strong>Sreamline your process with recordings you already have by importing multitrack recordings from Zoom, Restream, StreamYard, Riverside, and more!
+            </p>
+            <p class="mb-2" style="max-width: 90ch;">
+            <strong>Quick Clips: </strong>In the studio extract a selection of the transcript as an audio clip or Audiogram video. This makes it fast to get short bites of content to repurpose and get more potential out of your media.
+            </p>
+
+            <p class="mb-2" style="max-width: 90ch;">
+            <strong>Ready-made Templates </strong>Adobe also has ready-made templates ready to jumpstart your project in a variety of formats and populate with your own content.
+            </p>
+        </div>
+      </div>
+    </section>
+    <!-- Summary -->
+    <section id="audiogram" class="mb-4">
+      <h2 class="mb-3">Summary</h2>
+      <p style="max-width: 95ch;">
+        Adobe Podcast is a useful and user-friendly tool that can support engaging instructional opportunities as well as
+        content creation for organizational needs.
+      </p>
+
+      <div class="card">
+        <div class="card-body">
+          <h3 class="h6 mb-2">Are you using Adobe Podcast in your instruction?</h3>
+          <p class="mb-3">
+            Do you have a use-case you’d like to share? I’d love to hear from you.
+          </p>
+          <a class="btn btn-uiuc" href="mailto:beinbor1@illinois.edu">
+            <i class="bi bi-envelope me-2"></i>Email: beinbor1@illinois.edu
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
