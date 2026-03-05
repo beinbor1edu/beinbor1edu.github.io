@@ -1,1 +1,1 @@
-# beinbor1.github.io
+# beinbor1edu.github.io
