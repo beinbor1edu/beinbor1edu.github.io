@@ -1,246 +1,378 @@
-# ScrollyMaker Project Plan
+# ScrollyMaker Unified Engineering Specification
 
-## Vision
-ScrollyMaker is a WYSIWYG-style scrollytelling editor that lets educators and content creators assemble interactive, media-rich narratives and then export them as Squarespace-friendly embed bundles built with HTML, CSS, JavaScript, and GSAP ScrollTrigger loaded from a CDN.
+Version: Draft – Consolidated for AI-assisted development.
 
-The core product goal is to make advanced scrollytelling feel like page building instead of custom front-end development, while still giving technical users clean hooks for customization.
+This document is the working specification for ScrollyMaker: a WYSIWYG-style scrollytelling system for authoring and exporting interactive stories that can be embedded into Squarespace pages and other CMS environments.
 
-## Primary product goals
-1. **WYSIWYG authoring** for scroll-driven stories made of reusable sections and blocks.
-2. **Easy Squarespace insertion** through copy-paste embeds, code blocks, and lightweight asset hosting patterns.
-3. **Rich media support** including text, images, video, audio, embeds, 3D assets, and data visualization.
-4. **Animation without build tooling** by relying on GSAP/ScrollTrigger via CDN and plain web technologies.
-5. **Accessible by default** with guardrails for keyboard access, reduced motion, semantics, captions, and contrast.
-6. **Responsive by design** for mobile, tablet, and desktop layouts.
-7. **Themeable CSS tokens** so colors, spacing, typography, and borders update globally from shared variables.
+It is intended to reduce ambiguity for future implementation work by aligning the editor, story schema, runtime engine, export pipeline, accessibility expectations, and Squarespace publishing model.
 
-## Ideal users
-- Educators building interactive learning modules.
-- Journalists and storytellers building explainers.
-- Marketers creating immersive case studies or product narratives.
-- Designers who need richer web storytelling without a full custom code workflow.
-- Developers who want a fast starter that can still be extended manually.
+## System overview
+ScrollyMaker has three layers:
 
-## Core use cases
-### 1. Learning experiences
-- Scroll through a lesson with staged text reveals.
-- Tie a 3D model rotation or camera movement to scroll progress.
-- Animate charts or diagrams as the learner advances.
-- Mix narration audio, captions, quiz-like prompts, and supplementary embeds.
+1. **Editor**: React + TypeScript authoring environment.
+2. **Story JSON**: portable schema shared between authoring and playback.
+3. **Runtime engine**: framework-free HTML/CSS/JavaScript playback layer powered by GSAP + ScrollTrigger via CDN.
 
-### 2. Interactive explainers
-- Pin key scenes while text steps advance.
-- Transition between images, charts, maps, and annotated media.
-- Let users switch from scroll control to direct manipulation with touch or mouse.
+The runtime engine is the source of truth for playback behavior. The editor's job is to generate story JSON that the runtime can execute without modification.
 
-### 3. Squarespace publishing
-- Build in ScrollyMaker.
-- Export a self-contained package or a hosted asset bundle plus a short embed snippet.
-- Paste the embed into a Squarespace Code Block with minimal manual setup.
+## Product goals
+- Make advanced scrollytelling feel approachable to non-developers.
+- Keep exported stories portable and CMS-friendly.
+- Support educational storytelling with text, image, video, audio, embeds, 3D assets, and data visualization.
+- Preserve a framework-free runtime so stories can be embedded in systems like Squarespace with minimal friction.
+- Bake in accessibility, responsive design, and reduced-motion support.
+- Use CSS custom properties so one theme token can update related fonts, borders, backgrounds, chart accents, and interaction styles globally.
 
-## Product principles
-- **Progressive power:** simple defaults for non-technical users, advanced panels for technical refinement.
-- **Portable output:** exported experiences should work outside the editor.
-- **Declarative authoring:** author content and behaviors through configuration instead of handwritten animation code where possible.
-- **Composable sections:** sections should stack cleanly and remain reusable.
-- **Performance-aware:** media-heavy stories should degrade gracefully on constrained devices.
-- **Accessible motion:** animations should support reduced-motion alternatives.
+## Target users
+- Educators creating interactive lessons and explainers.
+- Designers and content teams producing immersive narratives.
+- Developers who want a structured editor but readable exported code.
+- CMS publishers who need copy-paste-friendly embeds for Squarespace.
 
-## Recommended technical approach
-### Runtime stack
-- **HTML** for exported document structure.
-- **CSS** with custom properties for theming and spacing.
-- **Vanilla JavaScript** for editor output/runtime glue.
-- **GSAP + ScrollTrigger via CDN** for timeline and scroll orchestration.
+## Architectural principles
+1. Runtime must remain framework-free.
+2. Story data must remain portable JSON.
+3. Components must be declared globally and referenced by steps.
+4. Steps modify component state, not component existence.
+5. Animations are state-driven and implemented inside components.
+6. Runtime must support CMS embedding and static hosting.
+7. The editor must never invent runtime-only behavior that cannot be expressed in the story schema.
 
-### Suggested optional integrations
-These can remain optional plugins so the base output stays simple.
-- **3D:** model-viewer for easy embeds, with optional Three.js adapter for advanced scenes.
-- **Data viz:** D3.js, Observable-style embeds, or lightweight chart adapters.
-- **Video:** native HTML5 video, Vimeo, YouTube wrappers.
-- **Audio:** native audio plus transcript/caption support.
-- **Embeds:** iframe wrapper blocks with aspect-ratio and lazy-load support.
+## Canonical story schema
+The canonical structure is:
 
-## Proposed architecture
-### 1. Authoring model
-Use a schema-driven document model:
-- **Project**
-  - metadata
-  - theme tokens
-  - global assets
-  - sections[]
-- **Section**
-  - layout type
-  - narrative steps
-  - pinned/sticky behavior
-  - background/media
-  - contained blocks[]
-  - timeline settings
-- **Block/Component**
-  - text
-  - image
-  - video
-  - audio
-  - chart
-  - 3D viewer
-  - embed
-  - callout
-  - button
-  - hotspot/annotation
+```text
+story
+ ├ components
+ ├ sections
+ │   └ steps
+ │       └ componentStates
+ └ theme
+```
 
-The editor should save projects as JSON, then render/export them into HTML/CSS/JS bundles.
+Components are declared once and reused across steps.
 
-### 2. Editor surface
-The editor can be split into five areas:
-1. **Canvas preview** with live scroll simulation.
-2. **Section outline** for ordering and structure.
-3. **Component library** for dragging blocks into sections.
-4. **Properties panel** for layout, content, theme, accessibility, and animation settings.
-5. **Timeline/trigger panel** for scroll ranges, pinning, scrub, and transitions.
+### Canonical example
+```json
+{
+  "components": {
+    "chart1": {
+      "type": "chart"
+    }
+  },
+  "sections": [
+    {
+      "layout": "text-graphic",
+      "steps": [
+        {
+          "componentStates": [
+            {
+              "id": "chart1",
+              "slot": "media",
+              "state": "overview"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "theme": {}
+}
+```
 
-### 3. Export system
-Support multiple export modes:
-- **Embed snippet export:** JS/CSS/HTML snippet for Squarespace Code Blocks.
-- **Hosted package export:** upload generated assets somewhere stable and paste a single embed wrapper into Squarespace.
-- **Standalone export:** plain files for any static host.
+### Schema rules
+- `components` is a global registry for all component definitions.
+- `sections` define story structure and layout.
+- `steps` define narrative progression within a section.
+- `componentStates` tell the runtime which globally defined component appears in which layout slot and which state it should take on during the step.
+- `theme` contains portable design tokens used by the runtime CSS layer.
 
-### 4. Squarespace integration strategy
-Because Squarespace can be restrictive, optimize for low-friction insertion:
-- Export a **single mount container** like `<div id="scrollymaker-story"></div>`.
-- Load CSS and JS from one or two hosted files when possible.
-- Prefer **scoped CSS** to avoid collisions with Squarespace styles.
-- Avoid assumptions about global resets or page width.
-- Provide presets for:
-  - full-width section
-  - inset narrative section
-  - sticky side-by-side explainer
-  - stacked mobile-safe layout
-- Include a **Squarespace checklist** in exports:
-  - where to paste HTML
-  - where to paste optional header scripts
-  - how to avoid duplicate CDN injections
-  - how to size spacers and full-bleed containers
+## Layout system
+Layouts define the visual structure for each section.
 
-## Content/component system
-### Essential first-wave components
-1. **Rich text block**
-   - headings, paragraphs, lists, pull quotes
-   - inline links and emphasis
-2. **Image block**
-   - alt text, caption, focal point, responsive sources
-3. **Video block**
-   - autoplay rules, captions, poster, mute/loop controls
-4. **Audio block**
-   - transcript support, captions where applicable, waveform option later
-5. **Embed block**
-   - iframe, form, map, external interactive
-6. **Callout/stat block**
-   - highlight important teaching moments or key numbers
-7. **Button/link block**
-   - jump to section, open modal, external link
+### Minimum MVP layouts
+- `text-graphic`
+- `fullscreen`
+- `overlay`
 
-### Advanced second-wave components
-8. **3D asset block**
-   - model source (GLB/USDZ where supported)
-   - camera presets
-   - scroll-linked rotation/translation
-   - optional user orbit controls on desktop/mobile
-   - annotations and hotspots
-9. **Data visualization block**
-   - simple charts from CSV/JSON
-   - step-based state changes tied to scroll
-   - optional hover/tap exploration mode
-10. **Annotation layer**
-   - pin labels to images, charts, or 3D scenes
-11. **Comparison block**
-   - before/after slider or side-by-side transitions
-12. **Timeline/process block**
-   - ideal for lessons and historical sequences
-13. **Knowledge check block**
-   - lightweight formative prompts or reveal answers
+### Layout contract
+Each layout defines one or more named slots. Example for `text-graphic`:
 
-## Scroll behavior model
-The editor should let users configure behaviors without writing code.
+```text
+text-graphic
 
-### Section-level scroll patterns
-- Standard enter/exit reveal.
-- Sticky/pinned scene with progressing steps.
-- Parallax backgrounds.
-- Scroll-scrubbed media progress.
-- Step narrative with active state changes.
-- Horizontal-on-vertical scroll sections.
-- Chapter breaks with full-screen transitions.
+slots:
+- text
+- media
+```
 
-### Component-level animation options
-- Fade, slide, scale, blur, mask reveal.
-- SVG path draw.
-- Number/count-up animation.
-- Chart/data state transitions.
-- 3D transform and camera keyframes.
-- Audio/video cue points.
+Example component placement:
 
-### Interaction layering
-Allow both **scroll-driven** and **direct interaction** modes:
-- A 3D object rotates on scroll until the user drags it.
-- A chart changes by scroll step, then supports hover/tap exploration.
-- A map pans by scroll, then allows pinch/zoom or tooltip interaction.
+```json
+{
+  "id": "chart1",
+  "slot": "media",
+  "state": "highlight"
+}
+```
 
-This dual-mode approach is especially important for education because learners may want both guided sequencing and self-directed exploration.
+### Responsive layout behavior
+- On desktop, slots may render side-by-side.
+- On tablet/mobile, slots must stack vertically unless a layout explicitly defines another accessible fallback.
+- Sticky and pinned experiences must degrade safely on short viewports and touch devices.
 
-## Accessibility requirements
-Accessibility should be designed into the model, not treated as cleanup.
+## Component model
+Components are defined globally in the story schema and instantiated once during runtime.
 
-### Must-have accessibility features
-- Semantic heading structure per section.
-- Alt text and long-description support for images and charts.
-- Captions/subtitles for video.
-- Transcript support for audio.
-- Keyboard access for all interactive controls.
-- Visible focus states.
-- Color contrast checking in the editor.
-- Reduced-motion mode with simplified transitions.
-- Non-scroll fallbacks so important content remains reachable.
-- Screen-reader-safe handling for pinned/sticky scenes.
-- Pause/stop controls for auto-playing or motion-heavy media.
+### MVP component set
+- `TextComponent`
+- `ImageComponent`
+- `VideoComponent`
+- `ChartComponent`
 
-### Accessibility-specific product guardrails
-- Warn if a component lacks alt text, captions, or transcript fields.
-- Warn if color tokens create low contrast.
-- Preview reduced-motion behavior in the editor.
-- Let users mark decorative assets as hidden from assistive tech.
-- Require text equivalents for essential data visualizations.
+### Planned extended component set
+- `AudioComponent`
+- `EmbedComponent`
+- `Model3DComponent`
+- `AnnotationComponent`
+- `CalloutComponent`
+- `KnowledgeCheckComponent`
 
-## Responsive strategy
-Mobile and tablet should not be an afterthought.
+### Key component rule
+Steps reference components and update their state. Components should not be created and destroyed on every step transition unless runtime cleanup requires it.
 
-### Layout rules
-- Sections should support desktop, tablet, and mobile overrides.
-- Sticky side-by-side layouts should collapse into stacked layouts on narrow screens.
-- Animation intensity should scale down on low-height or touch-first viewports.
-- Tap targets should meet accessible sizing.
-- Media should use aspect-ratio constraints and lazy loading.
+## Component lifecycle contract
+Every runtime component must implement the following methods:
+- `init()`
+- `render()`
+- `enter()`
+- `update(state)`
+- `exit()`
+- `destroy()`
 
-### Device-specific behavior
-- Allow per-breakpoint control over:
-  - pinning enabled/disabled
-  - asset quality level
-  - animation complexity
-  - text size and spacing
-  - media swap options
-- For 3D and data-heavy experiences, provide graceful fallbacks:
-  - static poster or video fallback
-  - simplified chart image + text summary
-  - alternate no-WebGL content path
+### Lifecycle meanings
+- `init()` → component instance is created and receives config.
+- `render()` → DOM is created and mounted into a layout slot.
+- `enter()` → step becomes active.
+- `update(state)` → component animates from its current state to the requested state.
+- `exit()` → step deactivates.
+- `destroy()` → runtime removes the component completely.
 
-## CSS system plan
-A tokenized CSS structure is a strong fit for your requirement that one color update every related usage.
+The `update(state)` method is the primary mechanism for scrollytelling transitions.
 
-### CSS architecture
-Use layers of custom properties:
-1. **Core tokens**: brand/system colors, spacing, typography, radius, shadows.
-2. **Semantic tokens**: text, background, accent, border, muted, success, warning.
-3. **Component tokens**: section backgrounds, card borders, button colors, chart palette slots.
-4. **Section overrides**: local token changes for a specific chapter/scene.
+## Runtime engine
+The runtime engine is responsible for:
+1. Loading story JSON.
+2. Resolving assets.
+3. Creating the section layout DOM.
+4. Instantiating components from the global registry.
+5. Registering ScrollTrigger-based step activation.
+6. Activating the initial step.
+
+### Runtime rendering pipeline
+```text
+loadStory()
+resolveAssets()
+createLayout()
+instantiateComponents()
+registerScrollTriggers()
+activateInitialStep()
+```
+
+### Runtime source-of-truth rule
+The runtime owns playback behavior. The editor preview should use the same runtime logic rather than a separate parallel interpretation.
+
+## ScrollTrigger integration
+ScrollTrigger controls step activation.
+
+### Example pattern
+```js
+ScrollTrigger.create({
+  trigger: stepElement,
+  start: "top center",
+  onEnter: () => activateStep(stepId)
+})
+```
+
+When a step activates, the runtime updates all component states referenced in that step.
+
+### Scroll behavior expectations
+- Sections may use enter/exit transitions, sticky steps, or pinned scenes.
+- Scroll progress may scrub state changes when a component supports it.
+- Scroll-driven interaction may optionally hand off to direct touch/mouse interaction for supported components like 3D models or charts.
+- Reduced-motion mode must minimize or simplify these transitions.
+
+## Animation model
+Animations are state-driven.
+
+### Core rule
+Steps update component states. Components handle their own animation transitions internally.
+
+Example:
+
+```js
+chart.update("highlight")
+```
+
+The runtime does not implement component-specific animation logic; it only coordinates state changes and lifecycle events.
+
+## Example story requirement
+A reference story must exist to validate the runtime engine.
+
+### Required example
+- 1 section
+- 3 steps
+- 1 reusable chart component
+
+### Required example states
+- `overview`
+- `highlight`
+- `zoom`
+
+### Purpose
+- Demonstrate component reuse.
+- Demonstrate state transitions.
+- Validate ScrollTrigger integration.
+- Provide a smoke-test fixture for the editor preview and export pipeline.
+
+## Editor architecture
+The editor should be implemented using React + TypeScript.
+
+### Editor responsibilities
+- Create sections.
+- Create steps.
+- Assign components to steps.
+- Edit component states.
+- Preview the runtime.
+- Export stories.
+
+### Editor layout
+- Top Toolbar
+- Component Library
+- Canvas Editor
+- Properties Panel
+- Timeline / MiniMap
+
+### Editor MVP scope
+The first version should support:
+- Section editor
+- Step editor
+- Component assignment
+- State editing
+- Runtime preview
+- Export
+
+The first version should explicitly defer:
+- Advanced timeline editors
+- Animation curve tools
+- Fully freeform layout authoring
+- Complex collaboration/versioning
+
+## Export pipeline
+Export must produce a portable story package.
+
+### Required structure
+```text
+index.html
+story.json
+assets/
+css/
+js/
+```
+
+### Export requirements
+- Exported stories must run without build tools.
+- Runtime assets should be lightweight and portable.
+- Packages should support both static hosting and CMS embedding.
+- Export should produce a clean embed target for Squarespace Code Blocks.
+
+## Squarespace publishing strategy
+Squarespace compatibility is a first-class requirement.
+
+### Publishing assumptions
+- Many users will paste a story into a Squarespace Code Block.
+- Some users may also use header/footer injection for shared assets.
+- Exported code must avoid assumptions about global resets, page width, or host styles.
+
+### Integration guidance
+- Scope story styles under a root selector such as `.sm-story`.
+- Support a single mount container like `<div id="scrollymaker-story"></div>`.
+- Allow CDN-hosted runtime/CSS assets when a fully self-contained snippet is too large.
+- Provide embed presets for inline, inset, and full-width page sections.
+- Include a publisher checklist that explains where HTML, CSS, runtime JS, and optional CDN assets belong inside Squarespace.
+
+## Runtime technology constraints
+The runtime must remain framework-free.
+
+### Allowed runtime dependencies
+- GSAP
+- ScrollTrigger
+
+### Avoid in runtime
+- React
+- Vue
+- Svelte
+- Build-time-only runtime dependencies
+
+Optional advanced integrations such as `model-viewer`, D3, or specialized embeds may be layered on top, but the core runtime should stay minimal and portable.
+
+## Performance requirements
+The runtime should:
+- Lazy load heavy assets.
+- Minimize DOM updates.
+- Reuse component instances.
+- Refresh ScrollTrigger on resize.
+- Offer lower-cost fallbacks for mobile or constrained devices.
+
+### Resize behavior
+```js
+window.addEventListener("resize", () => ScrollTrigger.refresh())
+```
+
+### Heavy-media strategy
+- 3D scenes should have poster or simplified fallbacks.
+- Large data visualizations should support reduced-detail mobile states.
+- Videos should support posters, muted autoplay-safe modes, and caption tracks.
+- Offscreen media should use lazy loading where possible.
+
+## Accessibility guidelines
+Runtime and editor output must support:
+- Semantic HTML
+- Alt text for images
+- Captions for video
+- Transcript support for audio
+- Keyboard navigation
+- Visible focus styles
+- Reduced motion preference
+- Screen-reader-safe step content
+- Text alternatives for essential visualizations
+
+### Reduced motion rule
+If reduced motion is enabled, animated transitions should be minimized or replaced with non-animated state changes.
+
+### Editor accessibility guardrails
+The editor should warn when:
+- An image lacks alt text.
+- A video lacks captions.
+- Audio lacks transcript content.
+- Theme tokens create poor contrast.
+- A chart or 3D scene lacks a text equivalent when the visual is instructional.
+
+## Responsive and interaction requirements
+- Layout slots should collapse into a readable vertical stack on narrow screens.
+- Sticky and pinned behavior should be optional by breakpoint.
+- Touch targets must remain accessible on tablets and phones.
+- Direct manipulation should complement scroll, not block it.
+- 3D and chart interactions should support touch/mouse exploration after or alongside scroll-based guidance where practical.
+
+## CSS token system
+ScrollyMaker should use CSS custom properties as the shared theming contract between exported stories and the editor preview.
+
+### Token layers
+1. Core tokens
+2. Semantic tokens
+3. Component tokens
+4. Section overrides
 
 ### Example token model
 ```css
@@ -268,148 +400,97 @@ Use layers of custom properties:
 }
 ```
 
-This lets one brand color update:
-- buttons
-- links
-- key borders
-- chart accents
-- annotation highlights
-- focus rings if desired
+### Token behavior expectations
+Changing a single token such as `--theme-accent` should update all dependent uses consistently, including buttons, key borders, links, chart accents, callouts, and focus treatments when configured to do so.
 
-### CSS implementation guidance
-- Scope exported styles under a story root class such as `.sm-story`.
-- Use semantic variables instead of hard-coded per-component colors.
-- Let sections override tokens with inline variables or section-specific classes.
-- Use `clamp()` for fluid type and spacing.
-- Include light/dark theme support.
-- Consider cascade layers for base, components, utilities, and overrides.
+## Media roadmap beyond MVP
+The runtime/editor design should leave room for richer components that are especially valuable for learning experiences.
 
-## Data model sketch
-A project JSON could look roughly like:
-```json
-{
-  "meta": {
-    "title": "Example lesson",
-    "slug": "example-lesson"
-  },
-  "theme": {
-    "accent": "#1d4ed8",
-    "background": "#ffffff",
-    "text": "#0f172a",
-    "border": "#cbd5e1"
-  },
-  "sections": [
-    {
-      "id": "intro",
-      "layout": "hero-sticky",
-      "scrollMode": "pinned-steps",
-      "blocks": [
-        {
-          "type": "text",
-          "content": "Intro copy"
-        },
-        {
-          "type": "model3d",
-          "src": "model.glb",
-          "interaction": {
-            "scrollLinked": true,
-            "dragEnabled": true
-          }
-        }
-      ]
-    }
-  ]
-}
-```
-
-## Suggested milestones
-### Phase 1: Proof of concept
-- Build runtime output for a small set of sections.
-- Support text, image, video, and sticky narrative steps.
-- Add GSAP/ScrollTrigger orchestration through CDN.
-- Export a Squarespace-compatible embed example.
-
-### Phase 2: Editor foundation
-- Add section list, canvas preview, and properties panel.
-- Save/load project JSON.
-- Add theme token editing.
-- Add accessibility validation warnings.
-
-### Phase 3: Advanced media
-- Add 3D block.
-- Add basic chart/data block.
-- Add annotations and step-driven transitions.
-- Improve mobile/touch interactions.
-
-### Phase 4: Publishing polish
-- Add export presets for Squarespace and generic static hosting.
-- Add performance budget checks.
-- Add reduced-motion preview and fallbacks.
-- Create starter templates for education-focused stories.
-
-## Risks and design tensions to plan for
-- **Squarespace code injection limits** may affect how global assets are loaded.
-- **3D performance** can vary drastically on older mobile devices.
-- **Pinned sections** can create accessibility and viewport-height issues on mobile browsers.
-- **WYSIWYG accuracy** may diverge from final embedded behavior if Squarespace styles interfere.
-- **External embeds** can create layout, privacy, and performance problems.
-- **Data visualization authoring** can become a product unto itself if not scoped carefully.
-
-## Early success metrics
-- Time required to publish a first story to Squarespace.
-- Percentage of stories published without hand-editing code.
-- Lighthouse/performance/accessibility baseline on mobile.
-- Number of reusable templates/components adopted by educators.
-- Completion rate for readers on learning experiences.
-
-## Immediate product questions that come to mind
-### Publishing and Squarespace
-1. Should ScrollyMaker export **fully self-contained snippets**, or is it acceptable to host shared CSS/JS assets externally and only paste a short embed into Squarespace?
-2. Which Squarespace version(s) matter most: **7.0, 7.1, Fluid Engine**, or multiple?
-3. Are users comfortable adding code to **header/footer injection areas**, or should the tool assume only a **single Code Block** is available?
-4. Do you want stories to live **inline within an existing page**, or often as **full landing pages**?
-
-### Editor scope
-5. How WYSIWYG should the first version be: true drag-and-drop visual editing, or a structured block editor with a strong live preview?
-6. Should the first release prioritize **template assembly** over freeform design?
-7. Do you want collaborative authoring/version history in scope early, or should this stay single-author at first?
-
-### 3D and interactivity
-8. Is the 3D goal mostly **product/artefact viewing**, **scientific/educational models**, or more cinematic scene-based storytelling?
-9. Do you need support for **annotated hotspots**, exploded views, or multiple model states?
-10. Should scroll always be able to hand off to touch/mouse interaction, or only for selected components?
-11. Is WebGL acceptable as an enhancement with fallback, or do you need a robust non-WebGL path from day one?
+### 3D assets
+- Scroll-linked state changes
+- Optional direct manipulation via touch/mouse
+- Annotations and hotspots
+- Mobile-safe fallbacks when WebGL is unavailable or too heavy
 
 ### Data visualization
-12. Should charts be authored from **uploaded CSV/JSON**, connected to live data sources, or both?
-13. Do you mainly need **standard charts** first, or more bespoke annotated diagrams/maps/process graphics?
-14. Should users be able to define chart state changes visually, like “at step 3 highlight this series and update this annotation”?
+- Reusable chart components with named states
+- Step-driven highlights and transitions
+- Optional hover/tap exploration after the guided scroll sequence
+- CSV/JSON-backed configuration in later iterations
 
-### Accessibility and pedagogy
-15. Are there accessibility standards you need to align to explicitly, such as **WCAG 2.2 AA**?
-16. Do learning experiences need built-in supports like **glossary terms, checkpoints, knowledge checks, transcripts, or downloadable resources**?
-17. Should there be a **reduced-motion preset** that is automatically generated for every project?
-18. Will stories need multilingual/localized content?
+### Audio, video, and embeds
+- Native support for captions/transcripts where relevant
+- Responsive aspect-ratio handling
+- Lazy loading and poster strategies
+- CMS-safe iframe wrappers for third-party embeds
 
-### Media and content operations
-19. Where will assets live: inside the tool, inside Squarespace, or on a separate CDN/storage bucket?
-20. Do you want reusable asset libraries and component templates for teams?
-21. Should video/audio support analytics, chapter markers, or narration sync?
-22. Are there privacy/compliance requirements for student-facing experiences?
+## Build instructions for AI development
+Recommended implementation order:
+1. Implement runtime engine.
+2. Implement component registry.
+3. Implement component system.
+4. Generate example story.
+5. Implement editor scaffold.
+6. Implement export pipeline.
 
-### Technical strategy
-23. Is “no build step” a hard requirement only for exported stories, or also for the editor itself?
-24. Should exported code be intentionally readable/editable by advanced users?
-25. How important is offline/local authoring compared with a hosted web app?
-26. Do you want a plugin system so new components like simulations or quizzes can be added later without changing the core editor?
+### Suggested runtime directory structure
+```text
+runtime/
+  scroll-engine.js
+  component-registry.js
+  animation-engine.js
+```
 
-## Recommended next step
-The best next step is to define a **v1 product slice** with:
-- 3 to 4 section templates
-- 5 to 6 core components
-- one 3D prototype path
-- one data-viz prototype path
-- one Squarespace publishing workflow
-- one accessibility checklist baked into the editor
+## Implementation milestones
+### Phase 1: Runtime proof of concept
+- Load story JSON.
+- Render one section with one reusable chart component.
+- Activate 3 steps with ScrollTrigger.
+- Validate the `overview`, `highlight`, and `zoom` state transitions.
 
-That would keep the first build focused while proving the most important publishing and learning-experience assumptions.
+### Phase 2: Editor scaffold
+- Build React + TypeScript shell.
+- Add section/step authoring.
+- Add component assignment UI.
+- Embed the runtime for preview.
+
+### Phase 3: Export + CMS validation
+- Export the required package structure.
+- Test standalone static hosting.
+- Test Squarespace Code Block embedding.
+- Validate scoped CSS and CDN runtime loading.
+
+### Phase 4: Extended components
+- Add image/video support.
+- Add audio and embed components.
+- Prototype 3D and data visualization extensions.
+- Add accessibility linting and responsive fallbacks.
+
+## Risks and design tensions
+- Squarespace injection constraints may affect whether exports are fully self-contained or asset-hosted.
+- Sticky/pinned scenes can become fragile on mobile browsers.
+- 3D features can quickly exceed performance budgets on older devices.
+- Data visualization authoring can expand beyond MVP if not constrained to reusable state-driven components.
+- A true WYSIWYG editor may diverge from final embedded behavior unless the preview is powered by the same runtime.
+
+## Immediate open questions
+### Publishing and CMS constraints
+1. Should v1 prefer fully self-contained embed snippets, or is hosted CSS/JS acceptable for production use?
+2. Which Squarespace environment matters most for testing: 7.0, 7.1, Fluid Engine, or multiple?
+3. Should v1 assume only Code Block access, or also support header/footer injection setups?
+
+### Editor and authoring scope
+4. Should the first editor feel more like structured block authoring with preview, or true drag-and-drop WYSIWYG editing?
+5. How much layout freedom should authors have in v1 beyond the three required layouts?
+6. Should exported code remain intentionally readable/editable for advanced users?
+
+### Learning-focused media
+7. Which advanced capability matters first after MVP: 3D, charts/data-viz, audio/transcript workflows, or knowledge checks?
+8. Do 3D and chart components need dual control modes from day one: scroll-driven plus touch/mouse interaction?
+9. Are there privacy or compliance constraints for student-facing experiences that affect embeds, analytics, or asset hosting?
+
+## Final notes for implementers
+- Do not invent additional architecture without updating this document.
+- Follow the schema and lifecycle contracts exactly.
+- Keep the runtime minimal, portable, and framework-free.
+- Ensure the editor always generates stories compatible with the runtime engine.
