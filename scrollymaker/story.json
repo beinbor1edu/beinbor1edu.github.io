@@ -2,7 +2,7 @@
   "meta": {
     "title": "ScrollyMaker Demo Lesson",
     "slug": "scrollymaker-demo-lesson",
-    "description": "A three-step chart-driven explainer that demonstrates reusable components and state transitions."
+    "description": "A three-step chart-driven explainer that demonstrates reusable components, CMS-style block editing, and state transitions."
   },
   "theme": {
     "accent": "#5b5cf0",
@@ -56,6 +56,20 @@
           "id": "step-overview",
           "title": "Start with an overview state",
           "body": "The same chart component appears throughout the story. Each step simply requests a new named state instead of rebuilding the chart.",
+          "blocks": [
+            {
+              "id": "step-overview-block-1",
+              "type": "text",
+              "label": "Scene introduction",
+              "content": "Use the left-hand canvas to place and review blocks directly in the story flow. Then use the inspector to refine content and settings."
+            },
+            {
+              "id": "step-overview-block-2",
+              "type": "callout",
+              "label": "Authoring pattern",
+              "content": "This mirrors the feel of familiar CMS builders: add blocks where you are composing, configure them in a dedicated side panel."
+            }
+          ],
           "componentStates": [
             {
               "id": "chart1",
@@ -73,6 +87,21 @@
           "id": "step-highlight",
           "title": "Guide attention with scroll-triggered updates",
           "body": "As the step activates, the runtime calls `update(state)` on the same chart instance. This creates a focused instructional beat without changing layout structure.",
+          "blocks": [
+            {
+              "id": "step-highlight-block-1",
+              "type": "text",
+              "label": "Instructional framing",
+              "content": "Keep narrative copy in stacked blocks so authors can mix text, callouts, image placeholders, and later embeds within the same scene."
+            },
+            {
+              "id": "step-highlight-block-2",
+              "type": "image",
+              "label": "Media placeholder",
+              "content": "https://placehold.co/900x520/1b2440/f4f7fb?text=Image+Block",
+              "caption": "A placeholder image block demonstrates how media can appear inside the WYSIWYG stack while the chart remains the reusable media component."
+            }
+          ],
           "componentStates": [
             {
               "id": "chart1",
@@ -90,6 +119,21 @@
           "id": "step-zoom",
           "title": "End with a deeper exploration state",
           "body": "The final step transitions to a zoomed interpretation of the data and reinforces how scroll guidance can hand off to richer interaction patterns later.",
+          "blocks": [
+            {
+              "id": "step-zoom-block-1",
+              "type": "text",
+              "label": "Deeper exploration",
+              "content": "Future versions can let these blocks represent 3D scenes, quizzes, audio, embeds, or data-rich interactives while keeping the authoring pattern consistent."
+            },
+            {
+              "id": "step-zoom-block-2",
+              "type": "embed",
+              "label": "Embed placeholder",
+              "content": "External interactive placeholder",
+              "caption": "Use this kind of block later for maps, custom iframes, simulations, or other external interactive media."
+            }
+          ],
           "componentStates": [
             {
               "id": "chart1",

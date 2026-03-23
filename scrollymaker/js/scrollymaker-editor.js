@@ -2,7 +2,9 @@
   const state = {
     story: null,
     runtime: null,
-    activeStepId: null
+    activeStepId: null,
+    selectedBlockId: null,
+    nextBlockNumber: 1
   };
 
   const els = {};
@@ -21,6 +23,14 @@
 
   function getActiveStep() {
     return getSteps().find((step) => step.id === state.activeStepId) || getSteps()[0] || null;
+  }
+
+  function getActiveBlocks() {
+    return getActiveStep()?.blocks || [];
+  }
+
+  function getSelectedBlock() {
+    return getActiveBlocks().find((block) => block.id === state.selectedBlockId) || getActiveBlocks()[0] || null;
   }
 
   function getChart() {
@@ -51,15 +61,129 @@
         <h3>${step.title}</h3>
         <p>${step.body}</p>
       `;
-      button.addEventListener('click', () => {
-        state.activeStepId = step.id;
-        fillForm();
-        if (state.runtime) {
-          state.runtime.activateStep(step.id);
-        }
-      });
+      button.addEventListener('click', () => selectStep(step.id));
       els.stepList.append(button);
     });
+  }
+
+  function renderWysiwygBlocks() {
+    const step = getActiveStep();
+    const blocks = getActiveBlocks();
+    els.wysiwygBlocks.innerHTML = '';
+
+    els.activeStepName.textContent = step?.title || 'No active step';
+    els.selectedBlockName.textContent = getSelectedBlock()?.label || 'None';
+
+    if (!blocks.length) {
+      const empty = document.createElement('div');
+      empty.className = 'sm-empty';
+      empty.textContent = 'No blocks yet. Use the add-block buttons above to compose this step.';
+      els.wysiwygBlocks.append(empty);
+      return;
+    }
+
+    blocks.forEach((block, index) => {
+      const article = document.createElement('article');
+      article.className = `sm-block-card sm-block-card--${block.type || 'text'}${block.id === state.selectedBlockId ? ' is-selected' : ''}`;
+      article.tabIndex = 0;
+      article.dataset.blockId = block.id;
+
+      const header = document.createElement('div');
+      header.className = 'sm-block-card__header';
+      header.innerHTML = `
+        <div>
+          <div class="sm-block-card__type">${block.type || 'text'} block</div>
+          <div class="sm-block-card__title">${block.label || `Block ${index + 1}`}</div>
+        </div>
+        <button class="sm-button sm-button--secondary" type="button" data-remove-block="${block.id}">Remove</button>
+      `;
+
+      const content = document.createElement('div');
+      content.className = 'sm-block-card__content';
+      if (block.type === 'image') {
+        content.innerHTML = `
+          <img src="${block.content || 'https://placehold.co/900x520/1b2440/f4f7fb?text=Image+Block'}" alt="${block.caption || block.label || 'Image block'}">
+        `;
+      } else if (block.type === 'embed') {
+        content.innerHTML = `<div class="sm-empty">${block.content || 'External interactive placeholder'}</div>`;
+      } else {
+        content.textContent = block.content || '';
+      }
+
+      article.append(header, content);
+
+      if (block.caption) {
+        const caption = document.createElement('div');
+        caption.className = 'sm-block-card__caption';
+        caption.textContent = block.caption;
+        article.append(caption);
+      }
+
+      article.addEventListener('click', (event) => {
+        if (event.target instanceof HTMLElement && event.target.dataset.removeBlock) {
+          removeBlock(event.target.dataset.removeBlock);
+          return;
+        }
+        selectBlock(block.id);
+      });
+      article.addEventListener('focus', () => selectBlock(block.id));
+      els.wysiwygBlocks.append(article);
+    });
+  }
+
+  function renderPreviewMeta() {
+    els.previewTitle.textContent = state.story.meta.title;
+    els.previewDescription.textContent = state.story.meta.description;
+    els.previewMeta.innerHTML = `
+      <div class="sm-meta-pill">${getSteps().length} scroll steps</div>
+      <div class="sm-meta-pill">${Object.keys(state.story.components || {}).length} reusable components</div>
+      <div class="sm-meta-pill">${getActiveBlocks().length} canvas blocks in active step</div>
+    `;
+  }
+
+  function renderJson() {
+    els.jsonOutput.textContent = JSON.stringify(state.story, null, 2);
+  }
+
+  function renderExport() {
+    els.exportOutput.textContent = [
+      '<div id="scrollymaker-story"></div>',
+      '<link rel="stylesheet" href="https://your-cdn.example/scrollymaker.css">',
+      '<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>',
+      '<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>',
+      '<script src="https://your-cdn.example/scrollymaker-runtime.js"></script>',
+      '<script>',
+      `  const story = ${JSON.stringify(state.story, null, 2)};`,
+      '  const runtime = new ScrollyMakerRuntime({',
+      '    container: document.getElementById("scrollymaker-story"),',
+      '    story',
+      '  });',
+      '  runtime.mount();',
+      '</script>'
+    ].join('\n');
+  }
+
+  function renderBlockInspector() {
+    const block = getSelectedBlock();
+    const hasBlock = Boolean(block);
+
+    els.blockPanelEmpty.hidden = hasBlock;
+    els.blockSettings.hidden = !hasBlock;
+
+    if (!hasBlock) {
+      els.blockType.value = '';
+      els.blockLabel.value = '';
+      els.blockContent.value = '';
+      els.blockCaption.value = '';
+      els.selectedBlockName.textContent = 'None';
+      return;
+    }
+
+    els.selectedBlockName.textContent = block.label || block.type;
+    els.blockType.value = block.type || '';
+    els.blockLabel.value = block.label || '';
+    els.blockContent.value = block.content || '';
+    els.blockCaption.value = block.caption || '';
   }
 
   function fillForm() {
@@ -91,41 +215,11 @@
     els.chartValue3.value = String(values[2] ?? '');
 
     renderStepList();
+    renderWysiwygBlocks();
+    renderBlockInspector();
     renderJson();
     renderExport();
     renderPreviewMeta();
-  }
-
-  function renderPreviewMeta() {
-    els.previewTitle.textContent = state.story.meta.title;
-    els.previewDescription.textContent = state.story.meta.description;
-    els.previewMeta.innerHTML = `
-      <div class="sm-meta-pill">${getSteps().length} scroll steps</div>
-      <div class="sm-meta-pill">${Object.keys(state.story.components || {}).length} reusable components</div>
-      <div class="sm-meta-pill">GSAP + ScrollTrigger runtime</div>
-    `;
-  }
-
-  function renderJson() {
-    els.jsonOutput.textContent = JSON.stringify(state.story, null, 2);
-  }
-
-  function renderExport() {
-    els.exportOutput.textContent = [
-      '<div id="scrollymaker-story"></div>',
-      '<link rel="stylesheet" href="https://your-cdn.example/scrollymaker.css">',
-      '<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>',
-      '<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>',
-      '<script src="https://your-cdn.example/scrollymaker-runtime.js"></script>',
-      '<script>',
-      `  const story = ${JSON.stringify(state.story, null, 2)};`,
-      '  const runtime = new ScrollyMakerRuntime({',
-      '    container: document.getElementById("scrollymaker-story"),',
-      '    story',
-      '  });',
-      '  runtime.mount();',
-      '</script>'
-    ].join('\n');
   }
 
   function rerenderRuntime() {
@@ -168,9 +262,101 @@
       chart.states[chartStateName].annotation = els.chartAnnotation.value.trim();
       chart.states[chartStateName].values = [els.chartValue1.value, els.chartValue2.value, els.chartValue3.value]
         .map((value) => Number.parseInt(value, 10))
-        .map((value) => Number.isFinite(value) ? Math.max(0, Math.min(value, 100)) : 0);
+        .map((value) => (Number.isFinite(value) ? Math.max(0, Math.min(value, 100)) : 0));
     }
 
+    fillForm();
+    rerenderRuntime();
+  }
+
+  function updateBlockFromForm() {
+    const block = getSelectedBlock();
+    if (!block) {
+      return;
+    }
+
+    block.label = els.blockLabel.value.trim() || block.label;
+    block.content = els.blockContent.value.trim();
+    block.caption = els.blockCaption.value.trim();
+
+    fillForm();
+    rerenderRuntime();
+  }
+
+  function selectStep(stepId) {
+    state.activeStepId = stepId;
+    const firstBlock = getActiveBlocks()[0];
+    state.selectedBlockId = firstBlock?.id || null;
+    fillForm();
+    if (state.runtime) {
+      state.runtime.activateStep(stepId);
+    }
+  }
+
+  function selectBlock(blockId) {
+    state.selectedBlockId = blockId;
+    fillForm();
+  }
+
+  function createBlock(type) {
+    state.nextBlockNumber += 1;
+    const id = `block-${Date.now()}-${state.nextBlockNumber}`;
+
+    const defaults = {
+      text: {
+        label: 'New text block',
+        content: 'Add narrative copy for this step here.',
+        caption: ''
+      },
+      callout: {
+        label: 'New callout',
+        content: 'Highlight an important insight, instruction, or teaching note.',
+        caption: ''
+      },
+      image: {
+        label: 'New image block',
+        content: 'https://placehold.co/900x520/1b2440/f4f7fb?text=New+Image+Block',
+        caption: 'Describe what the image adds to the lesson.'
+      },
+      embed: {
+        label: 'New embed block',
+        content: 'External interactive placeholder',
+        caption: 'Add setup instructions or context for this embed.'
+      }
+    };
+
+    return {
+      id,
+      type,
+      ...(defaults[type] || defaults.text)
+    };
+  }
+
+  function addBlock(type) {
+    const step = getActiveStep();
+    if (!step) {
+      return;
+    }
+
+    if (!Array.isArray(step.blocks)) {
+      step.blocks = [];
+    }
+
+    const block = createBlock(type);
+    step.blocks.push(block);
+    state.selectedBlockId = block.id;
+    fillForm();
+    rerenderRuntime();
+  }
+
+  function removeBlock(blockId) {
+    const step = getActiveStep();
+    if (!step || !Array.isArray(step.blocks)) {
+      return;
+    }
+
+    step.blocks = step.blocks.filter((block) => block.id !== blockId);
+    state.selectedBlockId = step.blocks[0]?.id || null;
     fillForm();
     rerenderRuntime();
   }
@@ -208,6 +394,14 @@
     const story = await response.json();
     state.story = story;
     state.activeStepId = story.sections?.[0]?.steps?.[0]?.id || null;
+    state.selectedBlockId = story.sections?.[0]?.steps?.[0]?.blocks?.[0]?.id || null;
+    state.nextBlockNumber = countBlocks(story);
+  }
+
+  function countBlocks(story) {
+    return (story.sections || []).reduce((total, section) => {
+      return total + (section.steps || []).reduce((stepTotal, step) => stepTotal + (step.blocks || []).length, 0);
+    }, 0);
   }
 
   async function init() {
@@ -232,6 +426,15 @@
       previewTitle: $('preview-title'),
       previewDescription: $('preview-description'),
       previewMeta: $('preview-meta'),
+      wysiwygBlocks: $('wysiwyg-blocks'),
+      activeStepName: $('active-step-name'),
+      selectedBlockName: $('selected-block-name'),
+      blockPanelEmpty: $('block-panel-empty'),
+      blockSettings: $('block-settings'),
+      blockType: $('block-type'),
+      blockLabel: $('block-label'),
+      blockContent: $('block-content'),
+      blockCaption: $('block-caption'),
       rerenderButton: $('rerender-button'),
       resetButton: $('reset-button')
     });
@@ -243,6 +446,14 @@
 
     document.querySelectorAll('[data-sync-story]').forEach((field) => {
       field.addEventListener('input', updateStoryFromForm);
+    });
+
+    document.querySelectorAll('[data-sync-block]').forEach((field) => {
+      field.addEventListener('input', updateBlockFromForm);
+    });
+
+    document.querySelectorAll('[data-add-block]').forEach((button) => {
+      button.addEventListener('click', () => addBlock(button.getAttribute('data-add-block')));
     });
 
     els.rerenderButton.addEventListener('click', rerenderRuntime);

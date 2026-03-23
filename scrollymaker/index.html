@@ -6,7 +6,7 @@
     <title>ScrollyMaker Prototype</title>
     <meta
       name="description"
-      content="Initial ScrollyMaker prototype with a portable story JSON model, framework-free runtime, and lightweight authoring controls."
+      content="Initial ScrollyMaker prototype with a portable story JSON model, framework-free runtime, and CMS-style block editing controls."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,18 +18,80 @@
   </head>
   <body>
     <div class="sm-app">
-      <aside class="sm-sidebar" aria-label="ScrollyMaker controls">
+      <main class="sm-preview-shell">
+        <section class="sm-hero">
+          <span class="sm-badge">CMS-style authoring prototype</span>
+          <h1 id="preview-title">ScrollyMaker Demo Lesson</h1>
+          <p id="preview-description">
+            A three-step chart-driven explainer that demonstrates reusable components, integrated block editing,
+            and a live runtime preview.
+          </p>
+          <div id="preview-meta" class="sm-meta-row"></div>
+        </section>
+
+        <section class="sm-builder" aria-labelledby="builder-title">
+          <div class="sm-builder__header">
+            <div>
+              <p class="sm-kicker">WYSIWYG canvas</p>
+              <h2 id="builder-title">Compose the active step directly in the story flow</h2>
+              <p class="sm-note">
+                Add blocks in the canvas, select them visually, and then use the inspector on the right to refine settings.
+              </p>
+            </div>
+            <div class="sm-toolbar sm-toolbar--builder">
+              <button class="sm-button" type="button" data-add-block="text">Add text block</button>
+              <button class="sm-button sm-button--ghost" type="button" data-add-block="callout">Add callout</button>
+              <button class="sm-button sm-button--ghost" type="button" data-add-block="image">Add image</button>
+              <button class="sm-button sm-button--ghost" type="button" data-add-block="embed">Add embed</button>
+            </div>
+          </div>
+
+          <div class="sm-builder__step-meta">
+            <div class="sm-meta-pill">Active step: <span id="active-step-name">Start with an overview state</span></div>
+            <div class="sm-meta-pill">Selected block: <span id="selected-block-name">Scene introduction</span></div>
+          </div>
+
+          <div id="wysiwyg-blocks" class="sm-wysiwyg-blocks" aria-live="polite"></div>
+        </section>
+
+        <section class="sm-runtime-panel" aria-labelledby="runtime-title">
+          <div class="sm-builder__header">
+            <div>
+              <p class="sm-kicker">Runtime preview</p>
+              <h2 id="runtime-title">Scroll-driven playback</h2>
+              <p class="sm-note">
+                This preview uses the framework-free runtime and the same story JSON model as the editor-side prototype.
+              </p>
+            </div>
+          </div>
+          <div id="story-preview" aria-live="polite"></div>
+        </section>
+
+        <div class="sm-footer-note">
+          <strong>What this prototype proves:</strong>
+          authors can add blocks in a familiar builder-style canvas, edit them in a right-side inspector,
+          and still drive a reusable runtime component model for scrollytelling playback.
+        </div>
+      </main>
+
+      <aside class="sm-sidebar" aria-label="ScrollyMaker inspector">
         <div class="sm-brand">
-          <span class="sm-badge">Initial prototype</span>
+          <span class="sm-badge">Inspector</span>
           <h1>ScrollyMaker</h1>
           <p>
-            A first working slice of the tool: editable story metadata, theme tokens,
-            step content, and a live runtime preview that reuses one chart component across three scroll steps.
+            The right-side panel is now dedicated to configuration. Choose a step or block, then edit its content,
+            theme tokens, and export output without leaving the canvas.
           </p>
         </div>
 
+        <section class="sm-step-list" aria-labelledby="step-list-title">
+          <h2 id="step-list-title">Steps</h2>
+          <p class="sm-note">Choose which story step is active in the canvas.</p>
+          <div id="step-list" class="sm-step-list__items"></div>
+        </section>
+
         <section class="sm-panel" aria-labelledby="story-panel-title">
-          <h2 id="story-panel-title">Story basics</h2>
+          <h2 id="story-panel-title">Story settings</h2>
           <div class="sm-sidebar__grid">
             <div class="sm-field">
               <label for="story-title">Story title</label>
@@ -44,7 +106,7 @@
 
         <section class="sm-panel" aria-labelledby="theme-panel-title">
           <h2 id="theme-panel-title">Theme tokens</h2>
-          <p>These color variables update the live preview and the exported story JSON.</p>
+          <p>These variables update the canvas and runtime preview globally.</p>
           <div class="sm-color-grid">
             <div class="sm-field">
               <label for="accent-color">Accent</label>
@@ -65,28 +127,22 @@
           </div>
         </section>
 
-        <section class="sm-step-list" aria-labelledby="step-list-title">
-          <h2 id="step-list-title">Steps</h2>
-          <p class="sm-note">Choose a step to edit its copy and the chart state attached to it.</p>
-          <div id="step-list" class="sm-step-list__items"></div>
-        </section>
-
         <section class="sm-panel" aria-labelledby="step-panel-title">
-          <h2 id="step-panel-title">Active step editor</h2>
+          <h2 id="step-panel-title">Active step settings</h2>
           <div class="sm-sidebar__grid">
             <div class="sm-field">
               <label for="step-title">Step title</label>
               <input id="step-title" type="text" data-sync-story />
             </div>
             <div class="sm-field">
-              <label for="step-body">Step body</label>
+              <label for="step-body">Step summary</label>
               <textarea id="step-body" data-sync-story></textarea>
             </div>
             <div class="sm-field">
               <label for="chart-annotation">Chart annotation for <span id="chart-state-name">overview</span></label>
               <textarea id="chart-annotation" data-sync-story></textarea>
             </div>
-            <fieldset class="sm-panel" style="margin:0; padding: 1rem;">
+            <fieldset class="sm-panel sm-panel--nested">
               <legend class="sm-legend">Chart values (%)</legend>
               <div class="sm-sidebar__grid">
                 <div class="sm-field">
@@ -104,6 +160,33 @@
               </div>
             </fieldset>
           </div>
+        </section>
+
+        <section class="sm-panel" aria-labelledby="block-panel-title">
+          <h2 id="block-panel-title">Selected block settings</h2>
+          <p id="block-panel-empty" class="sm-note">Select a block in the canvas to edit its settings.</p>
+          <div id="block-settings" class="sm-sidebar__grid">
+            <div class="sm-field">
+              <label for="block-type">Block type</label>
+              <input id="block-type" type="text" readonly />
+            </div>
+            <div class="sm-field">
+              <label for="block-label">Block label</label>
+              <input id="block-label" type="text" data-sync-block />
+            </div>
+            <div class="sm-field">
+              <label for="block-content">Block content</label>
+              <textarea id="block-content" data-sync-block></textarea>
+            </div>
+            <div class="sm-field">
+              <label for="block-caption">Block caption</label>
+              <textarea id="block-caption" data-sync-block></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="sm-panel" aria-labelledby="inspector-actions-title">
+          <h2 id="inspector-actions-title">Inspector actions</h2>
           <div class="sm-toolbar">
             <button id="rerender-button" class="sm-button" type="button">Refresh preview</button>
             <button id="reset-button" class="sm-button sm-button--secondary" type="button">Reset story</button>
@@ -116,29 +199,10 @@
         </section>
 
         <section class="sm-export" aria-labelledby="export-title">
-          <h2 id="export-title">Squarespace embed starter</h2>
+          <h2 id="export-title">CMS embed starter</h2>
           <pre><code id="export-output"></code></pre>
         </section>
       </aside>
-
-      <main class="sm-preview-shell">
-        <section class="sm-hero">
-          <span class="sm-badge">Runtime preview</span>
-          <h1 id="preview-title">ScrollyMaker Demo Lesson</h1>
-          <p id="preview-description">
-            A three-step chart-driven explainer that demonstrates reusable components and state transitions.
-          </p>
-          <div id="preview-meta" class="sm-meta-row"></div>
-        </section>
-
-        <div id="story-preview" aria-live="polite"></div>
-
-        <div class="sm-footer-note">
-          <strong>What this prototype proves:</strong>
-          one globally registered chart component can be updated by multiple steps, theme tokens can update live,
-          and the export surface can stay friendly to Squarespace-style embedding.
-        </div>
-      </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>

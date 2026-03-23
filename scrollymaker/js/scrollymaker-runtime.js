@@ -188,6 +188,42 @@
     chart: ChartComponent
   };
 
+  function renderRuntimeBlock(block) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `sm-rendered-step__block sm-rendered-step__block--${block.type || 'text'}`;
+
+    if (block.label) {
+      const heading = document.createElement('strong');
+      heading.textContent = block.label;
+      heading.style.display = 'block';
+      heading.style.marginBottom = '0.45rem';
+      wrapper.append(heading);
+    }
+
+    if (block.type === 'image') {
+      const img = document.createElement('img');
+      img.src = block.content || '';
+      img.alt = block.caption || block.label || 'Image block';
+      img.style.borderRadius = '12px';
+      img.style.marginBottom = '0.75rem';
+      wrapper.append(img);
+    } else {
+      const text = document.createElement('div');
+      text.textContent = block.content || '';
+      wrapper.append(text);
+    }
+
+    if (block.caption) {
+      const caption = document.createElement('p');
+      caption.className = 'sm-note';
+      caption.style.marginTop = '0.6rem';
+      caption.textContent = block.caption;
+      wrapper.append(caption);
+    }
+
+    return wrapper;
+  }
+
   class ScrollyMakerRuntime {
     constructor({ container, story }) {
       this.container = container;
@@ -268,7 +304,6 @@
         mediaFrame.append(canvas);
 
         const mountedSlots = { media: mediaSlot, caption: captionSlot };
-
         const renderedIds = new Set();
         (section.steps || []).forEach((step) => {
           (step.componentStates || []).forEach((componentState) => {
@@ -289,11 +324,22 @@
           article.className = 'sm-rendered-step';
           article.tabIndex = 0;
           article.dataset.stepId = step.id;
-          article.innerHTML = `
-            <div class="sm-rendered-step__index">Step ${stepIndex + 1}</div>
-            <h3>${step.title || `Step ${stepIndex + 1}`}</h3>
-            <p>${step.body || ''}</p>
-          `;
+
+          const index = document.createElement('div');
+          index.className = 'sm-rendered-step__index';
+          index.textContent = `Step ${stepIndex + 1}`;
+
+          const heading = document.createElement('h3');
+          heading.textContent = step.title || `Step ${stepIndex + 1}`;
+
+          const summary = document.createElement('p');
+          summary.textContent = step.body || '';
+
+          const blocks = document.createElement('div');
+          blocks.className = 'sm-rendered-step__blocks';
+          (step.blocks || []).forEach((block) => blocks.append(renderRuntimeBlock(block)));
+
+          article.append(index, heading, summary, blocks);
           stepsCol.append(article);
           this.stepMap.set(step.id, { step, element: article });
         });
