@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ScrollyMaker Prototype</title>
+    <meta
+      name="description"
+      content="Initial ScrollyMaker prototype with a portable story JSON model, framework-free runtime, and lightweight authoring controls."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/scrollymaker.css" />
+  </head>
+  <body>
+    <div class="sm-app">
+      <aside class="sm-sidebar" aria-label="ScrollyMaker controls">
+        <div class="sm-brand">
+          <span class="sm-badge">Initial prototype</span>
+          <h1>ScrollyMaker</h1>
+          <p>
+            A first working slice of the tool: editable story metadata, theme tokens,
+            step content, and a live runtime preview that reuses one chart component across three scroll steps.
+          </p>
+        </div>
+
+        <section class="sm-panel" aria-labelledby="story-panel-title">
+          <h2 id="story-panel-title">Story basics</h2>
+          <div class="sm-sidebar__grid">
+            <div class="sm-field">
+              <label for="story-title">Story title</label>
+              <input id="story-title" type="text" data-sync-story />
+            </div>
+            <div class="sm-field">
+              <label for="story-description">Description</label>
+              <textarea id="story-description" data-sync-story></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="sm-panel" aria-labelledby="theme-panel-title">
+          <h2 id="theme-panel-title">Theme tokens</h2>
+          <p>These color variables update the live preview and the exported story JSON.</p>
+          <div class="sm-color-grid">
+            <div class="sm-field">
+              <label for="accent-color">Accent</label>
+              <input id="accent-color" type="color" value="#5b5cf0" data-sync-story />
+            </div>
+            <div class="sm-field">
+              <label for="background-color">Background</label>
+              <input id="background-color" type="color" value="#0b1020" data-sync-story />
+            </div>
+            <div class="sm-field">
+              <label for="surface-color">Surface</label>
+              <input id="surface-color" type="color" value="#11172a" data-sync-story />
+            </div>
+            <div class="sm-field">
+              <label for="text-color">Text</label>
+              <input id="text-color" type="color" value="#f4f7fb" data-sync-story />
+            </div>
+          </div>
+        </section>
+
+        <section class="sm-step-list" aria-labelledby="step-list-title">
+          <h2 id="step-list-title">Steps</h2>
+          <p class="sm-note">Choose a step to edit its copy and the chart state attached to it.</p>
+          <div id="step-list" class="sm-step-list__items"></div>
+        </section>
+
+        <section class="sm-panel" aria-labelledby="step-panel-title">
+          <h2 id="step-panel-title">Active step editor</h2>
+          <div class="sm-sidebar__grid">
+            <div class="sm-field">
+              <label for="step-title">Step title</label>
+              <input id="step-title" type="text" data-sync-story />
+            </div>
+            <div class="sm-field">
+              <label for="step-body">Step body</label>
+              <textarea id="step-body" data-sync-story></textarea>
+            </div>
+            <div class="sm-field">
+              <label for="chart-annotation">Chart annotation for <span id="chart-state-name">overview</span></label>
+              <textarea id="chart-annotation" data-sync-story></textarea>
+            </div>
+            <fieldset class="sm-panel" style="margin:0; padding: 1rem;">
+              <legend class="sm-legend">Chart values (%)</legend>
+              <div class="sm-sidebar__grid">
+                <div class="sm-field">
+                  <label for="chart-value-1">Before supports</label>
+                  <input id="chart-value-1" type="text" inputmode="numeric" data-sync-story />
+                </div>
+                <div class="sm-field">
+                  <label for="chart-value-2">Guided scrolling</label>
+                  <input id="chart-value-2" type="text" inputmode="numeric" data-sync-story />
+                </div>
+                <div class="sm-field">
+                  <label for="chart-value-3">Direct exploration</label>
+                  <input id="chart-value-3" type="text" inputmode="numeric" data-sync-story />
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="sm-toolbar">
+            <button id="rerender-button" class="sm-button" type="button">Refresh preview</button>
+            <button id="reset-button" class="sm-button sm-button--secondary" type="button">Reset story</button>
+          </div>
+        </section>
+
+        <section class="sm-export" aria-labelledby="json-title">
+          <h2 id="json-title">Portable story JSON</h2>
+          <pre><code id="json-output"></code></pre>
+        </section>
+
+        <section class="sm-export" aria-labelledby="export-title">
+          <h2 id="export-title">Squarespace embed starter</h2>
+          <pre><code id="export-output"></code></pre>
+        </section>
+      </aside>
+
+      <main class="sm-preview-shell">
+        <section class="sm-hero">
+          <span class="sm-badge">Runtime preview</span>
+          <h1 id="preview-title">ScrollyMaker Demo Lesson</h1>
+          <p id="preview-description">
+            A three-step chart-driven explainer that demonstrates reusable components and state transitions.
+          </p>
+          <div id="preview-meta" class="sm-meta-row"></div>
+        </section>
+
+        <div id="story-preview" aria-live="polite"></div>
+
+        <div class="sm-footer-note">
+          <strong>What this prototype proves:</strong>
+          one globally registered chart component can be updated by multiple steps, theme tokens can update live,
+          and the export surface can stay friendly to Squarespace-style embedding.
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+    <script>
+      if (window.gsap && window.ScrollTrigger) {
+        window.gsap.registerPlugin(window.ScrollTrigger);
+      }
+    </script>
+    <script src="./js/scrollymaker-runtime.js"></script>
+    <script src="./js/scrollymaker-editor.js"></script>
+  </body>
+</html>
